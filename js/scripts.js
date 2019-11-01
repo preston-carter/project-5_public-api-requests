@@ -12,16 +12,20 @@ scripts.js
 
 const $search = $('.search-container');
 const $profileGallery = $('.gallery');
+const $body = $('body');
 let profileData = [];
 
 /*
 * Fetch API Functions
 */
 
-fetch('https://randomuser.me/api/?results=12&inc=picture,name,email,location')
+fetch('https://randomuser.me/api/?results=12&nat=us&inc=picture,name,email,location,cell,dob')
   .then(checkStatus)
   .then(response => response.json())
-  .then(data => storeProfileData(data))
+  .then(data => {
+    profileData = data.results;
+    appendProfileData(profileData);
+  })
   .catch(error => console.log('Looks like there was a problem!', error));
 
 /*
@@ -37,26 +41,53 @@ function checkStatus(response) {
   }
 }
 
-function storeProfileData(data) {
-  profileData = data.results;
+function appendProfileData(profile) {
+
   profileData.forEach(profile => {
-    const profileInfo = `
-    <div class="card">
-        <div class="card-img-container">
-            <img class="card-img" src="${profile.picture.medium}" alt="profile picture">
-        </div>
-        <div class="card-info-container">
-            <h3 id="name" class="card-name cap">${profile.name.first} ${profile.name.last}</h3>
-            <p class="card-text">${profile.email}</p>
-            <p class="card-text cap">${profile.location.city}, ${profile.location.state}</p>
-        </div>
-    </div>
-    `;
-    $profileGallery.append(profileInfo);
+
+    const $profileCard = $('<div class="card"></div>');
+
+    $profileCard.html(`
+      <div class="card-img-container">
+          <img class="card-img" src="${profile.picture.large}" alt="profile picture">
+      </div>
+      <div class="card-info-container">
+          <h3 id="name" class="card-name cap">${profile.name.first} ${profile.name.last}</h3>
+          <p class="card-text">${profile.email}</p>
+          <p class="card-text cap">${profile.location.city}</p>
+      </div>
+    `);
+
+    $profileGallery.append($profileCard);
+
+    $profileCard.on('click', () => {
+      console.log(profile);
+      addModalWindow(profile);
+    });
   });
-  return profileData;
 }
 
-/*
-* Event Listeners
-*/
+function addModalWindow(profile) {
+
+  const $selectedProfModal = $('<div class="modal-container"></div>');
+
+  $selectedProfModal.html(`
+    <div class="modal">
+      <button type="button" id="modal-close-btn" class="modal-close-btn"><strong>X</strong></button>
+      <div class="modal-info-container">
+          <img class="card-img" src="${profile.picture.large}" alt="profile picture">
+          <h3 id="name" class="modal-name cap">${profile.name.first} ${profile.name.last}</h3>
+          <p class="modal-text">${profile.email}</p>
+          <p class="modal-text cap">${profile.location.city}</p>
+          <hr>
+          <p class="modal-text">${profile.cell}</p>
+          <p class="modal-text">${profile.location.street}, ${profile.location.city}, ${profile.location.state} ${profile.location.postcode}</p>
+          <p class="modal-text">Birthday: ${profile.location.date}</p>
+      </div>
+    </div>
+  `);
+
+  $body.append($selectedProfModal);
+  console.log($selectedProfModal);
+
+}
