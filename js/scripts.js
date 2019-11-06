@@ -23,9 +23,11 @@ fetch('https://randomuser.me/api/?results=12&nat=us&inc=picture,name,email,locat
   .then(checkStatus)
   .then(response => response.json())
   .then(data => {
+    //Add fetch results to profileData as an array of objects
     profileData = data.results;
-    console.log(profileData);
+    //Run functions to append the 12 fetched profiles to the dom and add search functionality
     appendProfileData(profileData);
+    addSearch();
   })
   .catch(error => console.log('Looks like there was a problem!', error));
 
@@ -33,6 +35,7 @@ fetch('https://randomuser.me/api/?results=12&nat=us&inc=picture,name,email,locat
 * Helper Functions
 */
 
+//Only fetch data if no scripting/server errors
 function checkStatus(response) {
   if(response.ok) {
     return Promise.resolve(response);
@@ -42,13 +45,14 @@ function checkStatus(response) {
   }
 }
 
+//Compile & append html elements for the 12 profile cards
 function appendProfileData(profile) {
 
   profileData.forEach(profile => {
 
-    const $profileCard = $('<div class="card"></div>');
+    const $profileContainer = $('<div class="card"></div>');
 
-    $profileCard.html(`
+    $profileContainer.html(`
       <div class="card-img-container">
           <img class="card-img" src="${profile.picture.large}" alt="profile picture">
       </div>
@@ -59,18 +63,21 @@ function appendProfileData(profile) {
       </div>
     `);
 
-    $profileGallery.append($profileCard);
+    $profileGallery.append($profileContainer);
 
-    $profileCard.click( () => {
+    //Add event listener to run modal window creation function when a card is clicked
+    $profileContainer.click( () => {
       addModalWindow(profile);
     });
   });
 }
 
+//Create a modal window and associated functionality/listeners for the modal view
 function addModalWindow(profile) {
 
   const $modalContainer = $('<div class="modal-container"></div>');
 
+  //Vars to parse fetch profile data into the proper format
   const cell = profile.cell;
   const cellConstructor = `${cell.substr(0,5)} ${cell.substr(6,)}`;
   const bday = profile.dob.date;
@@ -95,30 +102,33 @@ function addModalWindow(profile) {
 
   $body.append($modalContainer);
 
+  //Vars to store our profileData index and div references to allow next/prev interaction
   let profileIndex = $.inArray(profile, profileData);
   const $modalButtons = $('<div class="modal-btn-container"></div>');
+  const $modalDiv = $('.modal');
 
+  //Create next/prev buttons checking for end case scenarios where we only want one button
   if( profileIndex === 0) {
     $modalButtons.html(`<button type="button" id="modal-next" class="modal-next btn">Next</button>
     `);
-    $('.modal').append($modalButtons);
+    $modalDiv.append($modalButtons);
   }
   else if ( profileIndex === 11) {
     $modalButtons.html(`<button type="button" id="modal-prev" class="modal-prev btn">Prev</button>
     `);
-    $('.modal').append($modalButtons);
+    $modalDiv.append($modalButtons);
   }
   else {
     $modalButtons.html(`<button type="button" id="modal-prev" class="modal-prev btn">Prev</button>
       <button type="button" id="modal-next" class="modal-next btn">Next</button>
     `);
-    $('.modal').append($modalButtons);
+    $modalDiv.append($modalButtons);
   }
 
+  //Event listeners to close the modal view by clicking the 'X' or by clicking off the window
   $('.modal-close-btn').click( () => {
     $modalContainer.remove();
   });
-
   $body.click( (e) => {
     if($modalContainer.show()) {
       if( $(e.target).hasClass('modal-container')) {
@@ -127,6 +137,7 @@ function addModalWindow(profile) {
     }
   });
 
+  //Vars and associated listeners for the next/prev functionality
   const $prevButton = $('#modal-prev');
   const $nextButton = $('#modal-next');
 
@@ -135,10 +146,34 @@ function addModalWindow(profile) {
     profileIndex -= 1;
     addModalWindow(profileData[profileIndex]);
   });
-
   $nextButton.click( () => {
     $modalContainer.remove();
     profileIndex += 1;
     addModalWindow(profileData[profileIndex]);
   });
+}
+
+//Create and append search feature to the dom
+function addSearch() {
+
+  const $formContainer = $('<div></div>');
+
+  $formContainer.html(`
+    <form action="#" method="get">
+        <input type="search" id="search-input" class="search-input" placeholder="Search...">
+        <input type="submit" value="&#x1F50D;" id="search-submit" class="search-submit">
+    </form>
+    `);
+
+  $search.append($formContainer);
+
+  let $searchInput = $('.search-input').val();
+  const $profileContainer = $('.card');
+  const $allProfileNames = $('.card h3');
+
+
+  for( let i = 0; i < $profileContainer.length; i += 1) {
+
+  }
+
 }
