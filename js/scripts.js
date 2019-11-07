@@ -27,7 +27,7 @@ fetch('https://randomuser.me/api/?results=12&nat=us&inc=picture,name,email,locat
     profileData = data.results;
     //Run functions to append the 12 fetched profiles to the dom and add search functionality
     appendProfileData(profileData);
-    addSearch();
+    search();
   })
   .catch(error => console.log('Looks like there was a problem!', error));
 
@@ -154,26 +154,47 @@ function addModalWindow(profile) {
 }
 
 //Create and append search feature to the dom
-function addSearch() {
+function search() {
 
-  const $formContainer = $('<div></div>');
+  const $form = $('<form action="#" method="get"></form>');
 
-  $formContainer.html(`
-    <form action="#" method="get">
-        <input type="search" id="search-input" class="search-input" placeholder="Search...">
-        <input type="submit" value="&#x1F50D;" id="search-submit" class="search-submit">
-    </form>
+  $form.html(`
+      <input type="search" id="search-input" class="search-input" placeholder="Search...">
+      <input type="submit" value="&#x1F50D;" id="search-submit" class="search-submit">
+      <input type="submit" value="🔄" id="search-reset" class="search-submit">
     `);
 
-  $search.append($formContainer);
+  $search.append($form);
 
-  let $searchInput = $('.search-input').val();
+  //Vars to reference targets for searching + user search input
+  const $searchSubmit = $('#search-submit');
+  const $searchReset = $('#search-reset');
   const $profileContainer = $('.card');
-  const $allProfileNames = $('.card h3');
+  const $allProfileNames = $('.card #name');
 
+  //Search input listener on submit button click
+  $searchSubmit.click( () => {
 
-  for( let i = 0; i < $profileContainer.length; i += 1) {
+    //Reference search input value + only search if field isn't empty
+    let $searchInput = $('#search-input').val();
 
-  }
+    if($searchInput.lenth !== 0) {
+      //Loop through all profile cards look for any names containing input string
+      for( let i = 0; i < $profileContainer.length; i += 1) {
+        if( $($allProfileNames[i]).text().toLowerCase().includes($searchInput) ) {
+          $($profileContainer[i]).show();
+        }
+        else {
+          $($profileContainer[i]).hide();
+        }
+      }
+    }
+  });
+
+  //Search reset listener on reset buttton click
+  $searchReset.click( () => {
+    $profileContainer.show();
+    $('form').trigger('reset');
+  });
 
 }
