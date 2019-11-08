@@ -173,8 +173,10 @@ function search() {
   const $allProfileNames = $('.card #name');
 
   //Search input listener on submit button click
-  $searchSubmit.click( () => {
+  $searchSubmit.click( (e) => {
 
+    //Required to submit search field properly on the Edge browser
+    e.preventDefault();
     //Reference search input value + only search if field isn't empty
     let $searchInput = $('#search-input').val();
 
@@ -192,7 +194,10 @@ function search() {
   });
 
   //Search reset listener on reset buttton click
-  $searchReset.click( () => {
+  $searchReset.click( (e) => {
+    //Required to submit search field properly on the Edge browser
+    e.preventDefault();
+
     $profileContainer.show();
     $('form').trigger('reset');
   });
