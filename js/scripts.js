@@ -178,7 +178,7 @@ function search() {
     //Required to submit search field properly on the Edge browser
     e.preventDefault();
     //Reference search input value + only search if field isn't empty
-    let $searchInput = $('#search-input').val();
+    let $searchInput = $('#search-input').val().toLowerCase();
 
     if($searchInput.lenth !== 0) {
       //Loop through all profile cards look for any names containing input string
